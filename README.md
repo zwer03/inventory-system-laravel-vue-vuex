@@ -1,5 +1,9 @@
 ## Instruction
-Default login:
+
+Start by database migration.
+your/path php artisan migrate —seed
+
+Default user
 email: sample@yahoo.com
 pw: password
 
