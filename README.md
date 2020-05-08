@@ -1,8 +1,10 @@
 ## Instruction
 
-Start by database migration.
-your/path php artisan migrate —seed
-
+1. composer update
+2. Generate app key. php artisan key:generate
+3. Generate jwt key. php artisan jwt:secret
+4. Run database migration. php artisan migrate —seed
+5. Clear and cache config. php artisan config:cache 
 Default user
 email: sample@yahoo.com
 pw: password
