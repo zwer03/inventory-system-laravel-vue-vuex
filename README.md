@@ -1,10 +1,18 @@
 ## Instruction
 
-1. composer update
-2. Generate app key. php artisan key:generate
-3. Generate jwt key. php artisan jwt:secret
-4. Run database migration. php artisan migrate —seed
-5. Clear and cache config. php artisan config:cache 
+1. Go to your project directory and run. 
+```composer update```
+```npm install```
+2. Rename .env.example to .env and setup your database.
+3. Generate app key. 
+```php artisan key:generate```
+4. Generate jwt key. 
+```php artisan jwt:secret```
+5. Run database migration. 
+```php artisan migrate —seed```
+6. Clear and cache config. 
+```php artisan config:cache ```
+
 Default user
 email: sample@yahoo.com
 pw: password
