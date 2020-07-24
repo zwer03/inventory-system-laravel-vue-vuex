@@ -12,6 +12,7 @@
 ```php artisan migrate —seed```
 6. Clear and cache config. 
 ```php artisan config:cache ```
+7. Open your .env file and add this. MIX_SENTRY_DSN_PUBLIC=http://yourdomain.com
 
 Default user
 email: sample@yahoo.com
