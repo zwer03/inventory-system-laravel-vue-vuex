@@ -1,15 +1,15 @@
 <template>
-    <div>
-        <crud-product></crud-product>
-    </div>
+  <div>
+    <crud-product></crud-product>
+  </div>
 </template>
 
 <script>
-import CrudProduct from '../components/CrudProduct';
+import CrudProduct from "../components/CrudProduct";
 export default {
-    components: {
-        CrudProduct
-    },
-    name: 'products',
+  components: {
+    CrudProduct,
+  },
+  name: "products",
 };
 </script>

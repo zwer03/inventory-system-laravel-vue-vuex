@@ -1,4 +1,8 @@
 import VueRouter from 'vue-router';
+import Login from './layout/Login'
+import Baseline from './layout/Baseline'
+import NotFound from './views/error/404'
+// import UnAuthorized from '../views/error/403'
 
 const isAuth = (to, from, next) => {
     const loggedIn = localStorage.getItem('user')
@@ -10,13 +14,17 @@ let routes = [
         name: 'login',
         path: '/login',
         component: require('./views/Login.vue').default,
+        meta: {
+            layout: Login
+        }
     },
     {
         name: 'home',
         path: '/',
         component: require('./views/Home.vue').default,
         meta: {
-            auth: true
+            auth: true,
+            layout: Baseline,
         },
         beforeEnter:  isAuth
     },
@@ -25,7 +33,8 @@ let routes = [
         path: '/inventories',
         component: require('./views/Inventories.vue').default,
         meta: {
-            auth: true
+            auth: true,
+            layout: Baseline,
         },
         beforeEnter: isAuth,
     },
@@ -34,7 +43,8 @@ let routes = [
         path: '/products',
         component: require('./views/Products.vue').default,
         meta: {
-            auth: true
+            auth: true,
+            layout: Baseline,
         },
         beforeEnter: isAuth,
     },
@@ -43,7 +53,8 @@ let routes = [
         path: '/companies',
         component: require('./views/Companies.vue').default,
         meta: {
-            auth: true
+            auth: true,
+            layout: Baseline,
         },
         beforeEnter: isAuth,
     },
@@ -52,7 +63,8 @@ let routes = [
         path: '/branches',
         component: require('./views/Branches.vue').default,
         meta: {
-            auth: true
+            auth: true,
+            layout: Baseline,
         },
         beforeEnter: isAuth,
     },
@@ -61,7 +73,8 @@ let routes = [
         path: '/warehouses',
         component: require('./views/Warehouses.vue').default,
         meta: {
-            auth: true
+            auth: true,
+            layout: Baseline,
         },
         beforeEnter: isAuth,
     },
@@ -70,7 +83,8 @@ let routes = [
         path: '/storages',
         component: require('./views/Storages.vue').default,
         meta: {
-            auth: true
+            auth: true,
+            layout: Baseline,
         },
         beforeEnter: isAuth,
     },
@@ -79,7 +93,8 @@ let routes = [
         path: '/transactions/:transaction_type/warehouse/:warehouse_id/status/:status',
         component: require('./views/Transactions.vue').default,
         meta: {
-            auth: true
+            auth: true,
+            layout: Baseline,
         },
         beforeEnter: isAuth,
     },
@@ -93,10 +108,14 @@ let routes = [
         path: '/users',
         component: require('./views/Users.vue').default,
         meta: {
-            auth: true
+            auth: true,
+            layout: Baseline,
         },
         beforeEnter: isAuth,
     },
+    { path: '/404', name: '404', component: NotFound, meta: {layout: NotFound} },
+    // { path: '/403', name: '403', component: UnAuthorized, meta: {layout: UnAuthorized} },
+    { path: '*', redirect: '/404' },
 ];
 
 const router = new VueRouter({

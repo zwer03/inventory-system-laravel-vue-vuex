@@ -2,11 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Branch;
+use App\Models\Branch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\BranchRequest;
+use App\Http\Repositories\ModelRepository;
+
 class BranchController extends Controller
 {
+    protected $model;
+
+    public function __construct(Branch $model)
+    {
+        $this->model = new ModelRepository($model);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +23,7 @@ class BranchController extends Controller
      */
     public function index(Request $request)
     {
-        return Branch::orderBy($request->column, $request->order)->paginate($request->items_per_page);
+        return $this->model->getPaginatedRecord($request);
     }
 
     /**
@@ -33,14 +42,9 @@ class BranchController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(BranchRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'address' => 'required'
-        ]);
-        $branch = Branch::create($validatedData);
-        return Branch::where('id',$branch->id)->first();
+        return $this->model->create($request->only($this->model->getModel()->fillable));
     }
 
     /**
@@ -72,18 +76,11 @@ class BranchController extends Controller
      * @param  \App\Branch  $branch
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Branch $branch)
+    public function update(BranchRequest $request, Branch $branch)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'address' => 'required'
-        ]);
-        
-        $branch->name = $request->name;
-        $branch->address = $request->address;
-        $branch->enabled = $request->enabled;
-        $branch->save();
-        return Branch::where('id', $branch->id)->first();
+        $this->model->update($request->only($this->model->getModel()->fillable), $branch);
+
+        return $request;
     }
 
     /**
@@ -92,20 +89,14 @@ class BranchController extends Controller
      * @param  \App\Branch  $branch
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Branch $branch)
+    public function destroy($id)
     {
-        $branch->delete();
+        $this->model->delete($id);
         return 'Branch deleted';
     }
 
     public function get()
     {
-        $model = Branch::select('id','name')->where('enabled', 1)->get();
-        $formatted_model = array();
-        foreach($model as $key=>$value){
-            $formatted_model[$key]['value'] = $value['id'];
-            $formatted_model[$key]['text'] = $value['name'];
-        }
-        return $formatted_model;
+        return $this->model->getListActiveRecords();
     }
 }

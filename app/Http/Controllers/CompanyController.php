@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Company;
+use App\Models\Company;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use App\Http\Requests\CompanyRequest;
+use App\Http\Repositories\ModelRepository;
+
 class CompanyController extends Controller
 {
+    protected $model;
+
+    public function __construct(Company $model)
+    {
+        $this->model = new ModelRepository($model);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,11 +22,7 @@ class CompanyController extends Controller
      */
     public function index(Request $request)
     {
-        $companies = Company::query();
-        if(request('sort_by') && request('sort_desc'))
-            $companies->orderBy(request('sort_by'), (request('sort_desc') === "true"?"desc":"asc"));
-        
-        return (request('items_per_page') == -1?$companies->paginate():$companies->paginate(request('items_per_page')));
+        return $this->model->getPaginatedRecord($request);
     }
 
     /**
@@ -37,15 +41,9 @@ class CompanyController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CompanyRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'address' => 'required',
-            'role' => 'required'
-        ]);
-        $company = Company::create($validatedData);
-        return Company::where('id',$company->id)->first();
+        return $this->model->create($request->only($this->model->getModel()->fillable));
     }
 
     /**
@@ -77,20 +75,11 @@ class CompanyController extends Controller
      * @param  \App\Company  $company
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Company $company)
+    public function update(CompanyRequest $request, Company $company)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'address' => 'required',
-            'role' => 'required'
-        ]);
-        
-        $company->name = $request->name;
-        $company->address = $request->address;
-        $company->role = $request->role;
-        $company->enabled = $request->enabled;
-        $company->save();
-        return $company;
+        $this->model->update($request->only($this->model->getModel()->fillable), $company);
+
+        return $request;
     }
 
     /**
@@ -99,9 +88,9 @@ class CompanyController extends Controller
      * @param  \App\Company  $company
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Company $company)
+    public function destroy($id)
     {
-        $company->delete();
+        $this->model->delete($id);
         return 'Company deleted';
     }
 

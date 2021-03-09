@@ -13,7 +13,8 @@ class Errors {
      * @param {string} field
      */
     has(field) {
-        return this.errors.hasOwnProperty(field);
+        if (typeof this.errors !== 'undefined') return this.errors.hasOwnProperty(field);
+        return false;
     }
 
 
@@ -53,6 +54,8 @@ class Errors {
      * @param {string|null} field
      */
     clear(field) {
+        console.log(field);
+        
         if (field) {
             delete this.errors[field];
 

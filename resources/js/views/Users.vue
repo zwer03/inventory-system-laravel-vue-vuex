@@ -1,15 +1,15 @@
 <template>
-    <div>
-        <crud-user></crud-user>
-    </div>
+  <div>
+    <crud-user></crud-user>
+  </div>
 </template>
 
 <script>
-import CrudUser from '../components/CrudUser';
+import CrudUser from "../components/CrudUser";
 export default {
-    components: {
-        CrudUser
-    },
-    name: 'users',
+  components: {
+    CrudUser,
+  },
+  name: "users",
 };
 </script>

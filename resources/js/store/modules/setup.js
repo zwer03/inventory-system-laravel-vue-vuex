@@ -8,11 +8,12 @@ const state = {
   products: [],
   inventories: [],
   transaction: [],
+  at_critical_level_products: []
 }
 
 // getters
 const getters = {
-  // 
+  at_critical_level_products: state => state.at_critical_level_products
 }
 
 // actions
@@ -50,19 +51,27 @@ const actions = {
   setTransaction({ state, commit }, transaction) {
     commit('setTransaction', transaction)
   },
+  getCriticalLevelProducts({ state, commit }) {
+    commit('getCriticalLevelProducts')
+  },
 }
 
 // mutations
 const mutations = {
   getDashboard(state) {
-    axios.get("/warehouses/get").then(response => {
-      state.warehouses = response.data;
-    });
-    axios.get("/transactions/get").then(response => {
+    axios.get("/warehouses/get")
+    .then(response => {
+      state.warehouses = response.data
+    })
+    .catch(error => {alert(error)})
+
+    axios.get("/transactions/get")
+    .then(response => {
       state.dashboard = response.data.transactions
       if (!response.data.notFresh) // Transaction has no data
         state.fresh = true
-    });
+    })
+    .catch(error => {alert(error)})
   },
   setWarehouse(state, warehouses) {
     state.warehouses = warehouses
@@ -106,10 +115,17 @@ const mutations = {
         inventory.quantity = value.quantity
         inventory.unit = value.product.unit
         inventories.push(inventory)
-      });
+      })
     }
     state.inventories = inventories
   },
+  getCriticalLevelProducts(state){
+    axios.get("/inventories/getCriticalLevelProducts")
+      .then(response => {
+        state.at_critical_level_products = response.data
+      })
+      .catch(error => {alert(error)})
+  }
 }
 
 export default {

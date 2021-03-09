@@ -2,12 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\UserRequest;
+use App\Http\Repositories\ModelRepository;
+
 class UserController extends Controller
 {
+    protected $model;
+
+    public function __construct(User $model)
+    {
+        $this->model = new ModelRepository($model);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -15,11 +23,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::query();
-        if(request('sort_by') && request('sort_desc'))
-            $users->orderBy(request('sort_by'), (request('sort_desc') === "true"?"desc":"asc"));
-        
-        return (request('items_per_page') == -1?$users->paginate():$users->paginate(request('items_per_page')));
+        return $this->model->getPaginatedRecord($request);
     }
 
     /**
@@ -38,15 +42,10 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(UserRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|max:255|string',
-            'email' => 'required|max:255|email|string',
-            'password' => 'required|min:8|confirmed',
-        ]);
-        $user = User::create($validatedData);
-        return User::where('id',$user->id)->first();
+        $user = User::create($request->all());
+        return User::where('id', $user->id)->first();
     }
 
     /**
@@ -78,20 +77,11 @@ class UserController extends Controller
      * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(UserRequest $request, User $user)
     {
-        $request->validate([
-            'name' => 'required|max:255|string',
-            'email' => 'required|max:255|email|string',
-            'password' => 'required|min:8|confirmed',
-        ]);
-        
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
-        $user->enabled = $request->enabled;
-        $user->save();
-        return $user;
+        $this->model->update($request->only($this->model->getModel()->fillable), $user);
+
+        return $request;
     }
 
     /**
@@ -100,30 +90,21 @@ class UserController extends Controller
      * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy(User $id)
     {
-        $user->delete();
+        $this->model->delete($id);
         return 'User deleted';
     }
 
     public function get()
     {
-        $model = User::select('id','name')->where('enabled', 1)->get();
-        $formatted_model = array();
-        foreach($model as $key=>$value){
-            $formatted_model[$key]['value'] = $value['id'];
-            $formatted_model[$key]['text'] = $value['name'];
-        }
-        return $formatted_model;
+        return $this->model->getListActiveRecords();
     }
 
     public function allow(Request $request)
     {
-        
         $user = User::find($request->id);
-
         $user->enabled = $request->enabled;
-
         $user->save();
         return $user;
     }

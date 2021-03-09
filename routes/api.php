@@ -13,32 +13,38 @@ use Illuminate\Http\Request;
 |
 */
 
-// Route::middleware('auth:api')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
-
 Route::post('login', 'AuthController@login')->name('login');
 Route::post('refresh', 'AuthController@refresh');
-Route::group(['middleware' => 'auth.jwt'], function(){
+
+Route::group(['middleware' => 'auth:api'], function() {
     Route::post('me', 'AuthController@me');
     Route::post('logout', 'AuthController@logout');
-    Route::get('/', 'HomeController@index')->name('home');
-    Route::get('branches/get', 'BranchController@get');
-    Route::get('warehouses/get', 'WarehouseController@get');
-    Route::get('storages/get', 'StorageController@get');
-    Route::get('companies/get', 'CompanyController@get');
-    Route::get('products/get', 'ProductController@get');
-    Route::get('transactions/get', 'TransactionController@get');
-    Route::get('getProductTransactions', 'TransactionController@getProductTransactions');
-    Route::get('inventories/checkCurrentQty', 'InventoryController@checkCurrentQty');
-    Route::resource('branches', 'BranchController')->only(['index','store','edit','update']);
-    Route::resource('warehouses', 'WarehouseController')->only(['index','store','edit','update']);
-    Route::resource('storages', 'StorageController')->only(['index','store','edit','update']);
-    Route::resource('companies', 'CompanyController')->only(['index','store','edit','update']);
-    Route::resource('products', 'ProductController')->only(['index','store','edit','update']);
-    Route::resource('inventories', 'InventoryController')->only(['index','store','edit','update']);
-    Route::resource('transactions', 'TransactionController')->only(['index','store','edit','update']);
+    
     Route::resource('users', 'UserController')->only(['index','store','edit','update']);
     Route::put('user/allow', 'UserController@allow');
+    
+    Route::get('/', 'HomeController@index')->name('home');
+
+    Route::get('transactions/get', 'TransactionController@get');
+    Route::get('getProductTransactions', 'TransactionController@getProductTransactions');
+    Route::resource('transactions', 'TransactionController')->only(['index','store','edit','update']);
+    
+    Route::get('branches/get', 'BranchController@get');
+    Route::resource('branches', 'BranchController')->only(['index','store','edit','update']);
+
+    Route::get('warehouses/get', 'WarehouseController@get');
+    Route::resource('warehouses', 'WarehouseController')->only(['index','store','edit','update']);
+
+    Route::get('storages/get', 'StorageController@get');
+    Route::resource('storages', 'StorageController')->only(['index','store','edit','update']);
+    
+    Route::get('companies/get', 'CompanyController@get');
+    Route::resource('companies', 'CompanyController')->only(['index','store','edit','update']);
+
+    Route::get('products/get', 'ProductController@get');
+    Route::resource('products', 'ProductController')->only(['index','store','edit','update']);
+
+    Route::get('inventories/checkCurrentQty', 'InventoryController@checkCurrentQty');
+    Route::get('inventories/getCriticalLevelProducts', 'InventoryController@getCriticalLevelProducts');
+    Route::resource('inventories', 'InventoryController')->only(['index','store','edit','update']);
 });

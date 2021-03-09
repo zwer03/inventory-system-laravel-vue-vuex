@@ -2,23 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Product;
+use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use App\Http\Requests\ProductRequest;
+use App\Http\Repositories\ModelRepository;
+
 class ProductController extends Controller
 {
+    protected $model;
+
+    public function __construct(Product $model)
+    {
+        $this->model = new ModelRepository($model);
+    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::query();
-        if(request('sort_by') && request('sort_desc'))
-            $products->orderBy(request('sort_by'), (request('sort_desc') === "true"?"desc":"asc"));
-        
-        return (request('items_per_page') == -1?$products->paginate():$products->paginate(request('items_per_page')));
+        return $this->model->getPaginatedRecord($request);
     }
 
     /**
@@ -37,19 +41,9 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'unit' => 'required',
-        ]);
-        $product = New Product();
-        $product->name = $request->name;
-        $product->internal_id = $request->internal_id;
-        $product->unit = $request->unit;
-        $product->alert_level = $request->alert_level;
-        $product->save();
-        return Product::where('id',$product->id)->first();
+        return $this->model->create($request->only($this->model->getModel()->fillable));
     }
 
     /**
@@ -81,20 +75,11 @@ class ProductController extends Controller
      * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(ProductRequest $request, Product $product)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'unit' => 'required',
-        ]);
-        
-        $product->name = $request->name;
-        $product->internal_id = $request->internal_id;
-        $product->unit = $request->unit;
-        $product->alert_level = $request->alert_level;
-        $product->enabled = $request->enabled;
-        $product->save();
-        return $product;
+        $this->model->update($request->only($this->model->getModel()->fillable), $product);
+
+        return $request;
     }
 
     /**
@@ -103,20 +88,14 @@ class ProductController extends Controller
      * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
-        $product->delete();
+        $this->model->delete($id);
         return 'Product deleted';
     }
 
     public function get()
     {
-        $model = Product::select('id','name')->where('enabled', 1)->get();
-        $formatted_model = array();
-        foreach($model as $key=>$value){
-            $formatted_model[$key]['value'] = $value['id'];
-            $formatted_model[$key]['text'] = $value['name'];
-        }
-        return $formatted_model;
+        return $this->model->getListActiveRecords();
     }
 }

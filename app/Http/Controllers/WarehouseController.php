@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Warehouse;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use App\Http\Repositories\ModelRepository;
+use App\Http\Requests\WarehouseRequest;
+
 class WarehouseController extends Controller
 {
+    protected $model;
+
+    public function __construct(Warehouse $model)
+    {
+        $this->model = new ModelRepository($model);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,11 +22,7 @@ class WarehouseController extends Controller
      */
     public function index(Request $request)
     {
-        $warehouses = Warehouse::query();
-        if(request('sort_by') && request('sort_desc'))
-            $warehouses->orderBy(request('sort_by'), (request('sort_desc') === "true"?"desc":"asc"));
-        
-        return (request('items_per_page') == -1?$warehouses->paginate():$warehouses->paginate(request('items_per_page')));
+        return $this->model->getPaginatedRecord($request);
     }
 
     /**
@@ -37,14 +41,9 @@ class WarehouseController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(WarehouseRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'short_name' => 'required|max:5',
-        ]);
-        $warehouse = Warehouse::create($validatedData);
-        return Warehouse::where('id',$warehouse->id)->first();
+        return $this->model->create($request->only($this->model->getModel()->fillable));
     }
 
     /**
@@ -76,18 +75,11 @@ class WarehouseController extends Controller
      * @param  \App\Warehouse  $warehouse
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Warehouse $warehouse)
+    public function update(WarehouseRequest $request, Warehouse $warehouse)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'short_name' => 'required|max:5',
-        ]);
+        $this->model->update($request->only($this->model->getModel()->fillable), $warehouse);
         
-        $warehouse->name = $request->name;
-        $warehouse->short_name = $request->short_name;
-        $warehouse->enabled = $request->enabled;
-        $warehouse->save();
-        return $warehouse;
+        return $request;
     }
 
     /**
@@ -96,20 +88,14 @@ class WarehouseController extends Controller
      * @param  \App\Warehouse  $warehouse
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Warehouse $warehouse)
+    public function destroy($id)
     {
-        $warehouse->delete();
+        $this->model->delete($id);
         return 'Warehouse deleted';
     }
 
     public function get()
     {
-        $model = Warehouse::select('id','name')->where('enabled', 1)->get();
-        $formatted_model = array();
-        foreach($model as $key=>$value){
-            $formatted_model[$key]['value'] = $value['id'];
-            $formatted_model[$key]['text'] = $value['name'];
-        }
-        return $formatted_model;
+        return $this->model->getListActiveRecords();
     }
 }

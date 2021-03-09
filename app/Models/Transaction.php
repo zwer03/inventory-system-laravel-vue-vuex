@@ -7,7 +7,7 @@
     5 = ongoing
     10 = completed
 */
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

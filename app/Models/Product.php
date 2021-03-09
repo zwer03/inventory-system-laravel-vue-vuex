@@ -1,19 +1,19 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Branch extends Model
+class Product extends Model
 {
-    protected $fillable = ['name', 'address', 'enabled'];
+    protected $fillable = ['name', 'internal_id', 'unit', 'enabled'];
 
-    public function user(){
-        return $this->belongsTo(User::class);
+    public function inventory(){
+        return $this->hasMany(Inventory::class);
     }
 
-    public function warehouse(){
-        return $this->hasMany(Warehouse::class);
+    public function transaction_details(){
+        return $this->hasMany(TransactionDetail::class);
     }
 
     public static function boot()

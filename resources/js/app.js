@@ -8,27 +8,47 @@ import './bootstrap';
 import router from './routes';
 import vuetify from './vuetify';
 import store from './store';
-import index from './views/index'
-const app = new Vue({
+import Application from './Application';
+/* Services */
+import {
+    errorService
+} from './services/error.service';
+
+new Vue({
     el: '#app',
     router,
     vuetify,
     store,
-    components: {index},
+    components: {
+        Application
+    },
     created() {
-        const userInfo = localStorage.getItem('user')
-        if (userInfo) {
-            const userData = JSON.parse(userInfo)
-            this.$store.commit('auth/setUserData', userData)
+        const hasUserData = localStorage.getItem('user')
+        if (hasUserData) {
+            const userData = JSON.parse(hasUserData)
+            this.$store.commit('authentication/SET_USER_DATA', userData)
+            // this.$store.dispatch("authentication/getPermissions");
         }
+
         axios.interceptors.response.use(
             response => response,
+
             error => {
-                if (error.response.status === 401) {
-                    this.$store.dispatch('auth/logout')
-                }
+                // this.$bvToast.toast(errorService.handleError(error), {
+                //     title: 'Error Message',
+                //     autoHideDelay: 5000,
+                //     variant: 'danger',
+                //     toaster: 'b-toaster-top-center',
+                //     solid: true
+                // })
+                this.snackBar = true;
+                this.snackBarColor = "error";
+                this.snackBarTxt = errorService.handleError(error);
                 return Promise.reject(error)
             }
         )
+
     },
+
+    template: '<Application/>'
 });

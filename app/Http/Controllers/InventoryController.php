@@ -2,29 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\Inventory;
-use App\Transaction;
-use App\TransactionDetail;
-use App\Product;
-use Illuminate\Support\Facades\DB;
+use App\Models\Product;
+use App\Models\Inventory;
+use App\Models\Transaction;
+use App\Models\TransactionDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Events\TransactionValidated;
+use App\Http\Repositories\ModelRepository;
 
 class InventoryController extends Controller
 {
+    protected $model;
+
+    public function __construct(Inventory $model)
+    {
+        $this->model = new ModelRepository($model);
+    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $inventories = Inventory::query();
-        $inventories->with('product', 'storage');
-        if (request('sort_by') && request('sort_desc'))
-            $inventories->orderBy(request('sort_by'), (request('sort_desc') === "true" ? "desc" : "asc"));
-
-        return (request('items_per_page') == -1?$inventories->paginate():$inventories->paginate(request('items_per_page')));
+        return $this->model->with(['product', 'storage'])->getPaginatedRecord($request);
     }
 
     /**
@@ -83,17 +86,20 @@ class InventoryController extends Controller
         $data = array('result' => true, 'message' => null);
         DB::beginTransaction();
         try {
+            // Check if transaction is adjustment or lost
             $isAdjustment = false;
-            $inventory = Inventory::with('product')->where(
-                ['product_id' => $request->product_id, 'storage_id' => $request->storage_id]
-            )->first();
-            $inventory->quantity = $request->quantity;
-            if ($inventory->quantity < $request->quantity)
-                $isAdjustment = true;
-            if (!empty($inventory->quantity) && isset($inventory->quantity))
-                $inventory->alert = ($inventory->quantity > $inventory->product->alert_level ? false : true);
-            $inventory->save();
+            $inventory->with('product')->where(
+                [
+                    'product_id' => $request->product_id,
+                    'storage_id' => $request->storage_id,
+                ]
+            )
+            ->first();
 
+            if ($inventory->quantity < $request->quantity) $isAdjustment = true;
+            
+            $inventory->quantity = $request->quantity;
+            
             $transaction = new Transaction;
             $transaction->transaction_type = ($isAdjustment ? 'adjustment' : 'lost');
             $transaction->status = 10;
@@ -108,6 +114,8 @@ class InventoryController extends Controller
             $transaction_detail->storage_id = $request->storage_id;
             $transaction_detail->save();
 
+            event(new TransactionValidated($transaction, $inventory->product, $inventory));
+            
             $data['result'] =  $inventory;
             $data['message'] = 'Transaction has been saved!';
 
@@ -115,7 +123,9 @@ class InventoryController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             $data['success'] = false;
-            $data['message'] = 'Transaction post failed! Stacktrace: (Message: ' . $e->getMessage() . '; Line: ' . $e->getLine() . ')';
+            $data['message'] = 'Transaction post failed! Stacktrace: (Message: ' . 
+                $e->getMessage() .
+                '; Line: ' . $e->getLine() . ')';
         }
         return $data;
     }
@@ -136,9 +146,16 @@ class InventoryController extends Controller
         $inventory['product_id'] = request('product_id');
         $inventory['quantity'] = 0;
 
-        $existing_inv = Inventory::select('product_id', 'quantity')->where('product_id', request('product_id'))->where('storage_id', request('storage_id'))->first();
-        if ($existing_inv)
-            $inventory = $existing_inv;
+        $existing_inv = Inventory::select('product_id', 'quantity')
+            ->where('product_id', request('product_id'))
+            ->where('storage_id', request('storage_id'))
+            ->first();
+        if ($existing_inv) $inventory = $existing_inv;
+
         return $inventory;
+    }
+
+    public function getCriticalLevelProducts(){
+        return Inventory::where('alert', 1)->orderByDesc('updated_at')->get();
     }
 }

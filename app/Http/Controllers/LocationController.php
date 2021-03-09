@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Location;
+use App\Models\Location;
 use Illuminate\Http\Request;
+use App\Http\Requests\LocationRequest;
+use App\Http\Repositories\ModelRepository;
 
 class LocationController extends Controller
 {
+    protected $model;
+
+    public function __construct(Location $model)
+    {
+        $this->model = new ModelRepository($model);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +22,7 @@ class LocationController extends Controller
      */
     public function index(Request $request)
     {
-        return Location::latest('id')->paginate($request->items_per_page);
+        return $this->model->getPaginatedRecord($request);
     }
 
     /**
@@ -33,13 +41,9 @@ class LocationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(LocationRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'description' => 'required'
-        ]);
-        return Location::create($validatedData);
+        return $this->model->create($request->only($this->model->getModel()->fillable));
     }
 
     /**
@@ -71,18 +75,11 @@ class LocationController extends Controller
      * @param  \App\Location  $location
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Location $location)
+    public function update(LocationRequest $request, Location $location)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'description' => 'required'
-        ]);
-        
-        $location->name = $request->name;
-        $location->description = $request->description;
-        $location->enabled = $request->enabled;
-        $location->save();
-        return $location;
+        $this->model->update($request->only($this->model->getModel()->fillable), $location);
+
+        return $request;
     }
 
     /**
@@ -91,20 +88,13 @@ class LocationController extends Controller
      * @param  \App\Location  $location
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Location $location)
+    public function destroy($id)
     {
-        $location->delete();
+        $this->model->delete($id);
         return 'Location deleted';
     }
     public function get()
     {
-        $locations = Location::select('id','name')->where('enabled', 1)->get();
-        $formatted_loc = array();
-        foreach($locations as $key=>$location){
-            $formatted_loc[$key]['value'] = $location['id'];
-            $formatted_loc[$key]['text'] = $location['name'];
-        }
-        return $formatted_loc;
-        // return Location::pluck('name', 'id');
+        return $this->model->getListActiveRecords();
     }
 }

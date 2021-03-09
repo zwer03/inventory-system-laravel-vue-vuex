@@ -1,16 +1,21 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Article extends Model
+class Branch extends Model
 {
-    protected $fillable = ['title', 'body'];
+    protected $fillable = ['name', 'address', 'enabled'];
 
-    public function article(){
+    public function user(){
         return $this->belongsTo(User::class);
     }
+
+    public function warehouse(){
+        return $this->hasMany(Warehouse::class);
+    }
+
     public static function boot()
     {
         parent::boot();
@@ -18,6 +23,7 @@ class Article extends Model
         static::creating(function($model)
         {
             $model->user_id = auth()->user()->id;
+            $model->enabled = 1;
         });
 
         static::updating(function($model)

@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Storage;
+use App\Models\Storage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use App\Http\Requests\StorageRequest;
+use App\Http\Repositories\ModelRepository;
+
 class StorageController extends Controller
 {
+    protected $model;
+
+    public function __construct(Storage $model)
+    {
+        $this->model = new ModelRepository($model);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,14 +22,8 @@ class StorageController extends Controller
      */
     public function index(Request $request)
     {
-        $storages = Storage::query();
-        $storages->with('warehouse');
-        if(request('search'))
-            $storages->where('id', request('search'));
-        if(request('sort_by') && request('sort_desc'))
-            $storages->orderBy(request('sort_by'), (request('sort_desc') === "true"?"desc":"asc"));
-        
-        return (request('items_per_page') == -1?$storages->paginate():$storages->paginate(request('items_per_page')));
+        $conditions = [['id', $request->search]];
+        return $this->model->with('warehouse')->getPaginatedRecord($request, $conditions);
     }
 
     /**
@@ -40,14 +42,10 @@ class StorageController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StorageRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'warehouse_id' => 'required'
-        ]);
-        $storage = Storage::create($validatedData);
-        return Storage::where('id',$storage->id)->with('warehouse')->first();
+        $storage = Storage::create($request->all());
+        return Storage::where('id', $storage->id)->with('warehouse')->first();
     }
 
     /**
@@ -79,18 +77,11 @@ class StorageController extends Controller
      * @param  \App\Storage  $storage
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Storage $storage)
+    public function update(StorageRequest $request, Storage $storage)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'warehouse_id' => 'required'
-        ]);
-        
-        $storage->name = $request->name;
-        $storage->warehouse_id = $request->warehouse_id;
-        $storage->enabled = $request->enabled;
-        $storage->save();
-        return $storage;
+        $this->model->update($request->only($this->model->getModel()->fillable), $storage);
+
+        return $request;
     }
 
     /**
@@ -99,20 +90,14 @@ class StorageController extends Controller
      * @param  \App\Storage  $storage
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Storage $storage)
+    public function destroy($id)
     {
-        $storage->delete();
+        $this->model->delete($id);
         return 'Storage deleted';
     }
 
     public function get()
     {
-        $model = Storage::with('warehouse')->where('enabled', 1)->get();
-        $formatted_model = array();
-        foreach($model as $key=>$value){
-            $formatted_model[$key]['value'] = $value['id'];
-            $formatted_model[$key]['text'] = $value['warehouse']['short_name'].' '.$value['name'];
-        }
-        return $formatted_model;
+        return $this->model->getListActiveRecords();
     }
 }

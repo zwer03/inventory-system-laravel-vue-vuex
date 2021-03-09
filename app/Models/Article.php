@@ -1,21 +1,16 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model
+class Article extends Model
 {
-    protected $fillable = ['name', 'internal_id', 'unit', 'enabled'];
+    protected $fillable = ['title', 'body'];
 
-    public function inventory(){
-        return $this->hasMany(Inventory::class);
+    public function article(){
+        return $this->belongsTo(User::class);
     }
-
-    public function transaction_details(){
-        return $this->hasMany(TransactionDetail::class);
-    }
-
     public static function boot()
     {
         parent::boot();
@@ -23,7 +18,6 @@ class Product extends Model
         static::creating(function($model)
         {
             $model->user_id = auth()->user()->id;
-            $model->enabled = 1;
         });
 
         static::updating(function($model)
