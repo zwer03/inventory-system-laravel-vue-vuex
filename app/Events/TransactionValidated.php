@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TransactionValidated implements ShouldBroadcast
+class TransactionValidated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -36,6 +36,6 @@ class TransactionValidated implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('transaction-validated');
+        // return new PrivateChannel('transaction-validated');
     }
 }

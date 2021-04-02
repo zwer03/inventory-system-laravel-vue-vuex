@@ -15,20 +15,4 @@ class Warehouse extends Model
     public function transactions(){
         return $this->hasMany(Transaction::class);
     }
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::creating(function($model)
-        {
-            $model->user_id = auth()->user()->id;
-            $model->enabled = 1;
-        });
-
-        static::updating(function($model)
-        {
-            $model->user_id = auth()->user()->id;
-        });
-    }
 }

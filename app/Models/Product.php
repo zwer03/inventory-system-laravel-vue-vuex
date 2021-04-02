@@ -15,20 +15,4 @@ class Product extends Model
     public function transaction_details(){
         return $this->hasMany(TransactionDetail::class);
     }
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::creating(function($model)
-        {
-            $model->user_id = auth()->user()->id;
-            $model->enabled = 1;
-        });
-
-        static::updating(function($model)
-        {
-            $model->user_id = auth()->user()->id;
-        });
-    }
 }

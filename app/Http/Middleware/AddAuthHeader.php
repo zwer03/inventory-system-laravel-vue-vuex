@@ -21,9 +21,7 @@ class AddAuthHeader
             $token = Cookie::get('_token');
             $request->headers->add(['Authorization' => 'Bearer ' . $token]);
         }
-
-        \Log::info($request->path());
-        \Log::info($request->headers);
+        
         return $next($request);
     }
 }

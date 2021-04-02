@@ -20,7 +20,7 @@ import Form from './utilities/Form';
 window.Vue = Vue;
 window.axios = axios;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-window.axios.defaults.baseURL = process.env.MIX_SENTRY_DSN_PUBLIC+'/api';
+window.axios.defaults.baseURL = `${window.location.hostname}/api`;
 
 window.NProgress = NProgress;
 window.Form = Form;

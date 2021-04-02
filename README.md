@@ -6,13 +6,12 @@
 2. Rename .env.example to .env and setup your database.
 3. Generate app key. 
 ```php artisan key:generate```
-4. Generate jwt key. 
-```php artisan jwt:secret```
+4. Create encryption keys for access tokens and personal access clients. 
+```php artisan passport:install```
 5. Run database migration. 
 ```php artisan migrate —seed```
 6. Clear and cache config. 
 ```php artisan config:cache ```
-7. Open your .env file and add this. MIX_SENTRY_DSN_PUBLIC=http://yourdomain.com
 
 Default user
 email: sample@yahoo.com

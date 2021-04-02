@@ -4,7 +4,7 @@
     'name' => 'IMS',
     'env' => 'local',
     'debug' => true,
-    'url' => 'http://localhost:8080',
+    'url' => 'http://localhost:8000',
     'asset_url' => NULL,
     'timezone' => 'UTC',
     'locale' => 'en',
@@ -178,7 +178,7 @@
       'file' => 
       array (
         'driver' => 'file',
-        'path' => '/var/www/html/storage/framework/cache/data',
+        'path' => 'C:\\Users\\nolie.francisco\\AppData\\Local\\laravel_projects\\inventory-system-laravel-vue-vuex\\storage\\framework/cache/data',
       ),
       'memcached' => 
       array (
@@ -263,11 +263,11 @@
       array (
         'driver' => 'mysql',
         'url' => NULL,
-        'host' => 'mysql',
+        'host' => '127.0.0.1',
         'port' => '3306',
         'database' => 'laravel',
-        'username' => 'nolie',
-        'password' => 'secret',
+        'username' => 'root',
+        'password' => '',
         'unix_socket' => '',
         'charset' => 'utf8',
         'collation' => 'utf8_unicode_ci',
@@ -283,11 +283,11 @@
       array (
         'driver' => 'pgsql',
         'url' => NULL,
-        'host' => 'mysql',
+        'host' => '127.0.0.1',
         'port' => '3306',
         'database' => 'laravel',
-        'username' => 'nolie',
-        'password' => 'secret',
+        'username' => 'root',
+        'password' => '',
         'charset' => 'utf8',
         'prefix' => '',
         'prefix_indexes' => true,
@@ -298,11 +298,11 @@
       array (
         'driver' => 'sqlsrv',
         'url' => NULL,
-        'host' => 'mysql',
+        'host' => '127.0.0.1',
         'port' => '3306',
         'database' => 'laravel',
-        'username' => 'nolie',
-        'password' => 'secret',
+        'username' => 'root',
+        'password' => '',
         'charset' => 'utf8',
         'prefix' => '',
         'prefix_indexes' => true,
@@ -344,13 +344,13 @@
       'local' => 
       array (
         'driver' => 'local',
-        'root' => '/var/www/html/storage/app',
+        'root' => 'C:\\Users\\nolie.francisco\\AppData\\Local\\laravel_projects\\inventory-system-laravel-vue-vuex\\storage\\app',
       ),
       'public' => 
       array (
         'driver' => 'local',
-        'root' => '/var/www/html/storage/app/public',
-        'url' => 'http://localhost:8080/storage',
+        'root' => 'C:\\Users\\nolie.francisco\\AppData\\Local\\laravel_projects\\inventory-system-laravel-vue-vuex\\storage\\app/public',
+        'url' => 'http://localhost:8000/storage',
         'visibility' => 'public',
       ),
       's3' => 
@@ -395,13 +395,13 @@
       'single' => 
       array (
         'driver' => 'single',
-        'path' => '/var/www/html/storage/logs/laravel.log',
+        'path' => 'C:\\Users\\nolie.francisco\\AppData\\Local\\laravel_projects\\inventory-system-laravel-vue-vuex\\storage\\logs/laravel.log',
         'level' => 'debug',
       ),
       'daily' => 
       array (
         'driver' => 'daily',
-        'path' => '/var/www/html/storage/logs/laravel.log',
+        'path' => 'C:\\Users\\nolie.francisco\\AppData\\Local\\laravel_projects\\inventory-system-laravel-vue-vuex\\storage\\logs/laravel.log',
         'level' => 'debug',
         'days' => 14,
       ),
@@ -451,7 +451,7 @@
       ),
       'emergency' => 
       array (
-        'path' => '/var/www/html/storage/logs/laravel.log',
+        'path' => 'C:\\Users\\nolie.francisco\\AppData\\Local\\laravel_projects\\inventory-system-laravel-vue-vuex\\storage\\logs/laravel.log',
       ),
     ),
   ),
@@ -474,7 +474,7 @@
       'theme' => 'default',
       'paths' => 
       array (
-        0 => '/var/www/html/resources/views/vendor/mail',
+        0 => 'C:\\Users\\nolie.francisco\\AppData\\Local\\laravel_projects\\inventory-system-laravel-vue-vuex\\resources\\views/vendor/mail',
       ),
     ),
     'log_channel' => NULL,
@@ -565,7 +565,7 @@
     'lifetime' => '120',
     'expire_on_close' => false,
     'encrypt' => false,
-    'files' => '/var/www/html/storage/framework/sessions',
+    'files' => 'C:\\Users\\nolie.francisco\\AppData\\Local\\laravel_projects\\inventory-system-laravel-vue-vuex\\storage\\framework/sessions',
     'connection' => NULL,
     'table' => 'sessions',
     'store' => NULL,
@@ -585,9 +585,9 @@
   array (
     'paths' => 
     array (
-      0 => '/var/www/html/resources/views',
+      0 => 'C:\\Users\\nolie.francisco\\AppData\\Local\\laravel_projects\\inventory-system-laravel-vue-vuex\\resources\\views',
     ),
-    'compiled' => '/var/www/html/storage/framework/views',
+    'compiled' => 'C:\\Users\\nolie.francisco\\AppData\\Local\\laravel_projects\\inventory-system-laravel-vue-vuex\\storage\\framework\\views',
   ),
   'websockets' => 
   array (

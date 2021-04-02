@@ -34,16 +34,10 @@ new Vue({
             response => response,
 
             error => {
-                // this.$bvToast.toast(errorService.handleError(error), {
-                //     title: 'Error Message',
-                //     autoHideDelay: 5000,
-                //     variant: 'danger',
-                //     toaster: 'b-toaster-top-center',
-                //     solid: true
-                // })
-                this.snackBar = true;
-                this.snackBarColor = "error";
-                this.snackBarTxt = errorService.handleError(error);
+                // this.snackBar = true;
+                // this.snackBarColor = "error";
+                // this.snackBarTxt = errorService.handleError(error);
+                alert(errorService.handleError(error))
                 return Promise.reject(error)
             }
         )

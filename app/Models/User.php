@@ -41,14 +41,4 @@ class User extends Authenticatable
     public function article(){
         return $this->hasMany(Article::class);
     }
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::creating(function($model)
-        {
-            $model->enabled = 1;
-        });
-    }
 }

@@ -123,7 +123,10 @@ export default {
 
   methods: {
     logout() {
-      this.$store.dispatch("authenthication/logout");
+      axios.post("/logout").then(() => {
+        this.$store.dispatch("authentication/logout");
+        this.$router.push({ name: "login" });
+      });
     },
   },
   computed: {
